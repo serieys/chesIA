@@ -13,21 +13,55 @@ var calculateBestMove =function(game) {
         game.undo();
         if (boardValue > bestValue) {
             bestValue = boardValue;
-            bestMove = newGameMove
+            bestMove = newGameMove;
         }
     }
 
-    game.move(newGameMoves[Math.floor(Math.random() * newGameMoves.length)]);
+    game.move(bestMove);
     board.position(game.fen());
 };
 
 var evaluateBoard = function(game) {
+  var boardValue = 0;
   for (var x = 1; x <= 8; x++) {
     for (var y = 1; y <= 8; y++) {
-      game.get((toLetters(x)+y).toLowerCase());
+      if (game.get((toLetters(x)+y).toLowerCase()) !== null) {
+        var chessPiece = game.get((toLetters(x)+y).toLowerCase());
+        boardValue += getChessPieceValue(chessPiece.type,chessPiece.color);
+      }
+
     }
   }
+return boardValue;
+}
 
+var getChessPieceValue = function(type, color) {
+  var chessPieceValue = 0;
+  switch (type) {
+    case "p":
+      chessPieceValue = 10;
+      break;
+    case "n":
+      chessPieceValue = 30;
+      break;
+    case "b":
+      chessPieceValue = 30;
+      break;
+    case "r":
+      chessPieceValue = 50;
+      break;
+    case "q":
+      chessPieceValue = 90;
+      break;
+    case "k":
+      chessPieceValue = 900;
+      break;
+    default:
+  }
+  if (color === "b") {
+    chessPieceValue *=-1;
+  }
+  return chessPieceValue;
 }
 
 
