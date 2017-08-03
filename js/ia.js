@@ -9,7 +9,7 @@ var calculateBestMove =function(game) {
         game.move(newGameMove);
 
         //take the negative as AI plays as black
-        var boardValue = -evaluateBoard(game);
+        var boardValue = alphabeta(50,game,true, 9999, -9999);
         game.undo();
         if (boardValue > bestValue) {
             bestValue = boardValue;
@@ -71,4 +71,65 @@ function toLetters(num) {
         pow = num / 26 | 0,
         out = mod ? String.fromCharCode(64 + mod) : (--pow, 'Z');
     return pow ? toLetters(pow) + out : out;
+}
+
+var minimax = function (depth, game, isMaximisingPlayer) {
+    if (depth === 0) {
+        return -evaluateBoard(game);
+    }
+    var newGameMoves = game.moves();
+    if (isMaximisingPlayer) {
+        var bestMove = -9999;
+        var length = newGameMoves.length;
+        for (var i = 0; i < length; i++) {
+            game.move(newGameMoves[i]);
+            bestMove = Math.max(bestMove, minimax(depth - 1, game, !isMaximisingPlayer));
+            game.undo();
+        }
+        return bestMove;
+    } else {
+        var bestMove = 9999;
+        var length = newGameMoves.length;
+        for (var i = 0; i < length; i++) {
+            game.move(newGameMoves[i]);
+            bestMove = Math.min(bestMove, minimax(depth - 1, game, !isMaximisingPlayer));
+            game.undo();
+        }
+        return bestMove;
+    }
+};
+
+
+function alphabeta(depth, game, isMaximisingPlayer, alpha, beta) {
+  if (depth === 0) {
+      return -evaluateBoard(game);
+  }
+  var newGameMoves = game.moves();
+  if (isMaximisingPlayer) {
+      var bestMove = -9999;
+      var length = newGameMoves.length;
+      for (var i = 0; i < length; i++) {
+          game.move(newGameMoves[i]);
+          bestMove = Math.max(bestMove, alphabeta(depth - 1, game, !isMaximisingPlayer, alpha, beta));
+          alpha = Math.max(alpha, bestMove);
+          game.undo();
+          if (beta <= alpha ) {
+            break;
+          }
+      }
+      return bestMove;
+  } else {
+    var bestMove = 9999;
+    var length = newGameMoves.length;
+    for (var i = 0; i < length; i++) {
+        game.move(newGameMoves[i]);
+        bestMove = Math.min(bestMove, alphabeta(depth - 1, game, !isMaximisingPlayer, alpha, beta));
+        alpha = Math.min(alpha, bestMove);
+        game.undo();
+        if (beta <= alpha ) {
+          break;
+        }
+    }
+    return bestMove;
+  }
 }
